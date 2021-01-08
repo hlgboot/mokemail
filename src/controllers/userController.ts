@@ -5,12 +5,38 @@ import { Request, Response } from "express"
 
 class userController{
     async create(req: Request, res: Response){
-        const { email } = req.body
-        // const { id } = req.query
+        const { email, tagId } = req.body
+
+        const userExists = await prisma.users.findUnique({
+            where:{
+                email: email
+            }
+        })
+
+        if(userExists){
+            const userUp = await prisma.users.update({
+                where:{
+                    email: email
+                },
+                data:{
+                    tags:{
+                        connect: {
+                            id: tagId
+                        }
+                    }
+                }
+            })
+            return res.send("User has been updated")
+        }
 
         const user = await prisma.users.create({
             data:{
-                email: email
+                email: email,
+                tags: {
+                    connect: {
+                        id: tagId
+                    }
+                }
             }
         })
 
