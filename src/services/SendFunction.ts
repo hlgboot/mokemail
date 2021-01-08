@@ -25,10 +25,13 @@ async function send({author_id , subject, body, attachements}: sendParams){
     if (!news){
         return 
     }
-//Consertar tipo das tags
     const users = await prisma.users.findMany({
-        include: {
-
+        where: {
+            tags: {
+                some:{
+                    id: news.tagsId
+                }
+            }
         }
     })
 
