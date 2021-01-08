@@ -7,14 +7,14 @@ const prisma = new PrismaClient()
 import transporter from "../transporter"
 import { Attachment } from 'nodemailer/lib/mailer'
 
-interface sendParams {
+interface MailerParams {
     author_id: number
     subject: string
     body: string
     attachements? : Attachment[]
 }
 
-async function send({author_id , subject, body, attachements}: sendParams){
+async function Mailer({author_id, subject, body} : MailerParams){
     const id = author_id
 
     const news = await prisma.newsletters.findUnique({
@@ -28,7 +28,7 @@ async function send({author_id , subject, body, attachements}: sendParams){
     const users = await prisma.users.findMany({
         where: {
             tags: {
-                some:{
+                some: {
                     id: news.tagsId
                 }
             }
@@ -37,16 +37,16 @@ async function send({author_id , subject, body, attachements}: sendParams){
 
     console.log(news, users)
 
+    users.map(async user => {
+        await transporter.sendMail({
+            from: `${news.email}`,
+            to: `${user.email}`,
+            subject: subject,
+            text: body       
+        })
+    })
 
-    /*transporter.sendMail({
-        from: `${news?.email}`,
-        to: "bhj",
-        subject: subject,
-        text: body,
-        attachments: attachements
 
-
-    })*/
 }
 
-export default send
+export default Mailer

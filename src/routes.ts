@@ -3,14 +3,15 @@ const routes = Router()
 
 import userController from "./controllers/userController"
 import newsletterController from "./controllers/newsletterController"
-import tagsController from "./controllers/tagsController"
+
 
 routes.post("/newsletter/create", newsletterController.create)
-routes.post("/newsletter/delete", newsletterController.delete)
+routes.delete("/newsletter/delete", newsletterController.delete)
+routes.post("/newsletter/:id", newsletterController.sendMail)
 
-routes.post("/user/create", userController.create)
-routes.post("/user/remove", userController.disconnect)
 
-routes.get("/tags", tagsController.index)
+routes.post("/newsletter/:tagId/subscribe", userController.create)
+routes.delete("/newsletter/unsubscribe", userController.disconnect)
+
 
 export default routes

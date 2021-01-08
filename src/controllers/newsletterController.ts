@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 import { Request, Response } from "express"
+import Mailer from "../services/SendFunction"
+
 
 class newsletterController{
     async create(req: Request, res: Response){
@@ -65,7 +67,17 @@ class newsletterController{
 
         
         res.send("Newsletter has been deleted")
-    } 
+    };
+
+    async sendMail(req: Request, res: Response){
+        const { id } = req.params
+        const { body, subject } = req.body
+        
+        await Mailer({author_id: parseInt(id), body, subject})
+        
+        res.send("Email has been sent")
+
+    }
 
 }
 

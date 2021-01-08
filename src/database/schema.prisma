@@ -23,4 +23,5 @@ model Users {
 model Tags {
   id Int @default(autoincrement()) @id
   name String? @unique
+  users Users[]
 }
