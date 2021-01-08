@@ -7,41 +7,65 @@ class userController{
     async create(req: Request, res: Response){
         const { email, tagId } = req.body
 
-        const userExists = await prisma.users.findUnique({
+        let user = await prisma.users.findUnique({
             where:{
                 email: email
             }
         })
 
-        if(userExists){
-            const userUp = await prisma.users.update({
-                where:{
-                    email: email
-                },
+        if(!user){
+            user = await prisma.users.create({
                 data:{
-                    tags:{
-                        connect: {
-                            id: tagId
-                        }
-                    }
+                    email: email
                 }
             })
-            return res.send("User has been updated")
         }
 
-        const user = await prisma.users.create({
+
+        await prisma.tags.update({
+            where:{
+                id: tagId,
+            },
             data:{
-                email: email,
-                tags: {
-                    connect: {
-                        id: tagId
-                    }
+                Users: {
+                    connect:{
+                        id: user.id
+                    }   
                 }
             }
         })
 
         res.send("User has been created")
     };
+
+    async disconnect(req: Request, res: Response){
+        const { email, tagId } = req.body
+
+        const user = await prisma.users.findUnique({
+            where:{
+                email: email
+            }
+        })
+
+        if(!user){
+            return res.status(401).send("User not found")
+        }
+
+        await prisma.users.update({
+            where: {
+                email: email
+            },
+            data:{
+                tags:{
+                    disconnect:{
+                        id: tagId
+                    }
+                }
+            }
+        })
+
+        res.send("User removed from" + tagId) 
+    }
 
 
 }

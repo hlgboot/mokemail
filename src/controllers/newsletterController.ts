@@ -36,7 +36,36 @@ class newsletterController{
         })
         res.send("Your newsletter has been created")
 
-    }; 
+    };
+
+    async delete(req: Request, res: Response){
+        const { id } = req.body
+
+        const news = await prisma.newsletters.findUnique({
+            where: {
+                id: id
+            }
+        })
+
+        if(!news) return res.send("Newsletter not found")
+
+        await prisma.newsletters.delete({
+            where: {
+                id: id
+            }
+        })
+        
+        await prisma.tags.delete({
+            where:{
+                id: news?.tagsId
+            }
+        })
+        
+
+
+        
+        res.send("Newsletter has been deleted")
+    } 
 
 }
 
